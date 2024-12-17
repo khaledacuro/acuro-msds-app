@@ -54,6 +54,8 @@ a:active {
   background-color: var(--secondary-color);
   font-weight: bold;
   padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
   border-radius: 0.5rem;
   font-size: 1.125rem /* 18px */;
   line-height: 1.75rem /* 28px */;
