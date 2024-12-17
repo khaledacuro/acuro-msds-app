@@ -33,7 +33,7 @@
         <thead class="bg-primary text-white sticky-header">
           <tr>
             <th class="py-3 px-6 border-b">
-              <input type="checkbox" @change="toggleSelectAll" v-model="selectAll" />
+              <!-- <input type="checkbox" @change="toggleSelectAll" v-model="selectAll" /> -->
             </th>
             <th @click="sortBy('file_name')" class="py-3 px-6 border-b cursor-pointer">File Name</th>
             <th @click="sortBy('created_at')" class="py-3 px-6 border-b cursor-pointer">Created</th>
@@ -66,6 +66,14 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- Pagination Links -->
+      <div class="mt-4 flex justify-between">
+        <button @click="fetchPaginatedData(pagination.prev_page_url)" :disabled="!pagination.prev_page_url"
+          class="btn text-white px-4 py-2">Previous</button>
+        <button @click="fetchPaginatedData(pagination.next_page_url)" :disabled="!pagination.next_page_url"
+          class="btn text-white px-4 py-2">Next</button>
+      </div>
     </div>
   </div>
 </template>
@@ -118,9 +126,9 @@ export default {
       this.sortColumn = column;
       this.fetchPaginatedData();
     },
-    toggleSelectAll() {
-      this.selectedDocuments = this.selectAll ? [...this.paginatedDocuments] : [];
-    },
+    // toggleSelectAll() {
+    //   this.selectedDocuments = this.selectAll ? [...this.paginatedDocuments] : [];
+    // },
     getFieldData(doc, fieldName) {
       return doc.document_data.find((item) => item.field.field_name === fieldName) || {};
     },

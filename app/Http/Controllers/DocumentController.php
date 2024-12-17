@@ -46,7 +46,7 @@ class DocumentController extends Controller
         }
 
         // Paginate the results
-        return $query->paginate(50);
+        return $query->paginate(20);
     }
 
 
