@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Color Variables */
+:root {
+  --primary-color: #12305c;
+  --secondary-color: #6aba21;
+  --white-color: #ffffff;
+  --primary-hover-color: #5a9a1d; /* Darker green */
+  --error-color: #ff0000;
+}
+
+/* Text Colors */
+.text-primary {
+  color: var(--primary-color);
+  font-family: 'Arial';
+}
+
+.text-secondary {
+  color: var(--secondary-color);
+}
+
+.text-white {
+  color: var(--white-color);
+}
+
+.text-error {
+  color: var(--error-color);
+}
+
+/* Background Colors */
+.bg-primary {
+  background-color: var(--primary-color);
+}
+
+.bg-secondary {
+  background-color: var(--secondary-color);
+}
+
+/* Hover Effects */
+.hover\:text-secondary:hover {
+  color: var(--primary-hover-color);
+}
+
+/* menu item active class */
+a:active {
+  color: var(--primary-color);
+}
+
+/* Custom Button Styles */
+.btn {
+  color: var(--white-color);
+  background-color: var(--secondary-color);
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1.125rem /* 18px */;
+  line-height: 1.75rem /* 28px */;
+  transition: background-color 0.3s;
+}

@@ -1,0 +1,36 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@rushstack/eslint-patch": "^1.10.4",
+        "@vitejs/plugin-vue": "^5.2.1",
+        "@vue/eslint-config-prettier": "^10.1.0",
+        "@vue/test-utils": "^2.4.6",
+        "autoprefixer": "^10.4.20",
+        "axios": "^1.7.4",
+        "eslint": "^9.17.0",
+        "eslint-plugin-vue": "^9.32.0",
+        "jsdom": "^25.0.1",
+        "laravel-vite-plugin": "^1.0",
+        "postcss": "^8.4.49",
+        "prettier": "^3.4.2",
+        "tailwindcss": "^3.4.16",
+        "vite": "^6.0.3",
+        "vite-plugin-vue-devtools": "^7.6.8",
+        "vitest": "^2.1.8"
+    },
+    "dependencies": {
+        "datatables.net": "^2.1.8",
+        "datatables.net-dt": "^2.1.8",
+        "glob": "^11.0.0",
+        "jquery": "^3.7.1",
+        "rimraf": "^6.0.1",
+        "vue-router": "^4.5.0",
+        "vue3-datepicker": "^0.4.0",
+        "xlsx": "^0.18.5"
+    }
+}
