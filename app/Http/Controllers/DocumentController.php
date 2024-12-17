@@ -13,14 +13,43 @@ use Illuminate\Support\Facades\Log;
 class DocumentController extends Controller
 {
     // Get a list of all documents
-    public function index()
+    public function index(Request $request)
     {
-        // Load documents with related document data and fields
-        $documents = Document::with('documentData.field')->get();
-        return response()->json($documents);
+        $query = Document::with('documentData.field');
+
+        // Searching
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+
+            $query->whereHas('documentData', function ($q) use ($search) {
+                $q->whereHas('field', function ($fieldQuery) use ($search) {
+                    $fieldQuery->where('field_name', 'Trade name')
+                        ->where('value', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        // Date Filtering
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('created_at', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59'
+            ]);
+        }
+
+        // Sorting
+        if ($request->has('sort_column') && $request->has('sort_direction')) {
+            $validColumns = ['file_name', 'created_at', 'updated_at'];
+            $sortColumn = in_array($request->sort_column, $validColumns) ? $request->sort_column : 'created_at';
+            $sortDirection = $request->sort_direction === 'desc' ? 'desc' : 'asc';
+            $query->orderBy($sortColumn, $sortDirection);
+        }
+
+        // Paginate the results
+        return $query->paginate(50);
     }
-    
-    
+
+
 
     // Get a specific document
     public function show($id)

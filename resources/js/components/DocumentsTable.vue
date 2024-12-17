@@ -1,52 +1,51 @@
 <template>
   <div class="overflow-x-auto">
     <div class="table-container">
+      <!-- Search and Date Filters -->
       <div class="mb-4 flex">
+
+        <div class="mr-4">
+          <label for="searchQuery">Search by Trade Name:</label>
+          <br>
+          <input id="searchQuery" type="text" v-model="searchQuery" @input="fetchPaginatedData"
+            placeholder="Enter Trade Name..."
+            class="border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200" />
+        </div>
+
+
         <div class="mr-4">
           <label for="startDate">Start Date:</label>
-          <date-picker
-            id="startDate"
-            v-model="startDate"
-            type="datetime"
-            valueType="format"
-            class="mr-4 border border-gray-300 rounded px-2 py-1 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-          />
+          <date-picker id="startDate" v-model="startDate" @change="fetchPaginatedData" />
         </div>
+
         <div>
           <label for="endDate">End Date:</label>
-          <date-picker
-            id="endDate"
-            v-model="endDate"
-            type="datetime"
-            valueType="format"
-            class="border border-gray-300 rounded px-2 py-1 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-          />
+          <date-picker id="endDate" v-model="endDate" @change="fetchPaginatedData" />
         </div>
+
       </div>
+
+      <!-- Export Button -->
       <button @click="exportToExcel" class="btn text-white px-4 py-2 mb-4">Export Selected</button>
-      <table id="myTable" class="min-w-full bg-white border shadow-lg pt-2 pb-2">
+
+      <!-- Documents Table -->
+      <table class="min-w-full bg-white border shadow-lg">
         <thead class="bg-primary text-white sticky-header">
-          <tr class="text-left">
+          <tr>
             <th class="py-3 px-6 border-b">
               <input type="checkbox" @change="toggleSelectAll" v-model="selectAll" />
             </th>
-            <th class="py-3 px-6 border-b">File Name</th>
-            <!-- Add created_at and updated_at column headers -->
-            <th class="py-3 px-6 border-b">Created</th>
-            <th class="py-3 px-6 border-b">Updated</th>
-            <th v-for="(field, index) in fieldNames" :key="index" class="py-2 px-4 border-b">
+            <th @click="sortBy('file_name')" class="py-3 px-6 border-b cursor-pointer">File Name</th>
+            <th @click="sortBy('created_at')" class="py-3 px-6 border-b cursor-pointer">Created</th>
+            <th @click="sortBy('updated_at')" class="py-3 px-6 border-b cursor-pointer">Updated</th>
+            <th v-for="(field, index) in fieldNames" :key="index" class="py-3 px-6 border-b">
               {{ field }}
             </th>
-
             <th class="py-3 px-6 border-b">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(doc, docIndex) in filteredDocuments"
-            :key="docIndex"
-            class="hover:bg-gray-100"
-          >
+          <tr v-for="(doc, index) in paginatedDocuments" :key="index" class="hover:bg-gray-100">
             <td class="py-3 px-6 border-b">
               <input type="checkbox" v-model="selectedDocuments" :value="doc" />
             </td>
@@ -54,19 +53,16 @@
             <td class="py-3 px-6 border-b">{{ doc.created_at }}</td>
             <td class="py-3 px-6 border-b">{{ doc.updated_at }}</td>
             <td v-for="(field, index) in fieldNames" :key="index" class="py-3 px-6 border-b">
-              {{ getFieldData(doc, field)?.value || 'N/A' }} <br />
-              <span
-                :class="
-                  getFieldData(doc, field)?.confidence >= 85 ? 'text-secondary' : 'text-error'
-                "
-                >{{ getFieldData(doc, field)?.confidence }}%</span
-              >
+              {{ getFieldData(doc, field)?.value || "N/A" }}
             </td>
-            <td class="py-2 px-4 border-b">
+            <td class="py-3 px-6 border-b">
               <router-link :to="{ name: 'DocumentDetail', params: { id: doc.id } }">
-                <button class="btn text-white px-4 py-2 rounded">View</button>
+                <button class="btn text-white px-4 py-2">View</button>
               </router-link>
             </td>
+          </tr>
+          <tr v-if="paginatedDocuments.length === 0">
+            <td colspan="100%" class="text-center py-3">No documents found.</td>
           </tr>
         </tbody>
       </table>
@@ -75,67 +71,65 @@
 </template>
 
 <script>
-import DatePicker from 'vue3-datepicker'
-import * as XLSX from 'xlsx'
-import $ from 'jquery'
-import 'datatables.net-dt/css/dataTables.dataTables.min.css'
-import 'datatables.net'
+import DatePicker from "vue3-datepicker";
+import * as XLSX from "xlsx";
+import { fetchDocuments } from "../services/apiService";
 
 export default {
-  name: 'DocumentsTable',
-  components: {
-    DatePicker
-  },
-  props: {
-    documents: {
-      type: Array,
-      required: true
-    }
-  },
+  components: { DatePicker },
   data() {
     return {
+      paginatedDocuments: [],
+      fieldNames: [],
       selectedDocuments: [],
       selectAll: false,
+      searchQuery: "",
       startDate: null,
       endDate: null,
-      filteredDocuments: []
-    }
-  },
-  computed: {
-    fieldNames() {
-      console.log('Calculating field names from documents')
-      const fieldNamesSet = new Set()
-      this.documents.forEach((doc) =>
-        doc.document_data.forEach((fieldData) => fieldNamesSet.add(fieldData.field.field_name))
-      )
-      // console.log('Field names:', Array.from(fieldNamesSet))
-      return Array.from(fieldNamesSet)
-    }
+      pagination: {},
+      sortColumn: "created_at",
+      sortDirection: "asc",
+    };
   },
   methods: {
-    getFieldData(doc, fieldName) {
-      // console.log('Getting field data for document:', doc, 'and field:', fieldName)
-      return doc.document_data.find((item) => item.field.field_name === fieldName) || {}
+    fetchPaginatedData(url = null) {
+      const fetchUrl = url || "http://localhost:8000/api/documents";
+      const params = {
+        search: this.searchQuery,
+        start_date: this.startDate,
+        end_date: this.endDate,
+        sort_column: this.sortColumn,
+        sort_direction: this.sortDirection,
+      };
+
+      fetchDocuments(fetchUrl, params).then((response) => {
+        this.paginatedDocuments = response.data;
+        this.pagination = {
+          current_page: response.current_page,
+          last_page: response.last_page,
+          next_page_url: response.next_page_url,
+          prev_page_url: response.prev_page_url,
+        };
+        this.fieldNames = this.extractFieldNames(response.data);
+      });
+    },
+    sortBy(column) {
+      this.sortDirection = this.sortColumn === column && this.sortDirection === "asc" ? "desc" : "asc";
+      this.sortColumn = column;
+      this.fetchPaginatedData();
     },
     toggleSelectAll() {
-      // console.log('Toggling select all. Current state:', this.selectAll)
-      this.selectedDocuments = this.selectAll ? [...this.filteredDocuments] : []
+      this.selectedDocuments = this.selectAll ? [...this.paginatedDocuments] : [];
     },
-    filterDocuments() {
-      console.log('Filtering documents from:', this.startDate, 'to:', this.endDate)
-      if (!this.startDate || !this.endDate) {
-        this.filteredDocuments = this.documents
-        console.log('Filtered documents (no date range):', this.filteredDocuments)
-        return
-      }
-      const start = new Date(this.startDate).getTime()
-      const end = new Date(this.endDate)
-      end.setHours(23, 59, 59, 999)
-      this.filteredDocuments = this.documents.filter((doc) => {
-        const createdAt = new Date(doc.created_at).getTime()
-        return createdAt >= start && createdAt <= end.getTime()
-      })
-      // console.log('Filtered documents:', this.filteredDocuments)
+    getFieldData(doc, fieldName) {
+      return doc.document_data.find((item) => item.field.field_name === fieldName) || {};
+    },
+    extractFieldNames(data) {
+      const fieldNamesSet = new Set();
+      data.forEach((doc) =>
+        doc.document_data.forEach((fieldData) => fieldNamesSet.add(fieldData.field.field_name))
+      );
+      return Array.from(fieldNamesSet);
     },
     exportToExcel() {
       console.log('Exporting selected documents to Excel:', this.selectedDocuments)
@@ -179,59 +173,28 @@ export default {
       // Write to file
       XLSX.writeFile(workbook, 'msdsdata.xlsx')
     },
-    initializeDataTable() {
-      console.log('Initializing DataTable')
-      $('#myTable').DataTable({
-        // paging: true,
-        paging: false,
-        searching: true,
-        ordering: true,
-        responsive: true,
-        // lengthChange: true
-        lengthChange: false
-
-      })
-    },
-    reinitializeDataTable() {
-      console.log('Reinitializing DataTable')
-      const table = $('#myTable').DataTable()
-      if (table) {
-        table.clear().destroy()
-      }
-      this.initializeDataTable()
-    }
-  },
-  mounted() {
-    console.log('Mounted DocumentsTable')
-    this.filteredDocuments = this.documents
-    this.$nextTick(() => {
-      this.initializeDataTable()
-    })
   },
   watch: {
+    searchQuery() {
+      this.fetchPaginatedData();
+    },
     startDate() {
-      console.log('Start date changed:', this.startDate)
-      this.filterDocuments()
+      this.fetchPaginatedData();
     },
     endDate() {
-      console.log('End date changed:', this.endDate)
-      this.filterDocuments()
+      this.fetchPaginatedData();
     },
-    documents() {
-      console.log('Documents prop changed:', this.documents)
-      this.filteredDocuments = this.documents
-      this.$nextTick(() => {
-        this.reinitializeDataTable()
-      })
-    }
-  }
-}
+  },
+  mounted() {
+    this.fetchPaginatedData();
+  },
+};
 </script>
 
 <style scoped>
 .table-container {
-  max-height: 70vh; /* Table's max height will be 70% of the viewport height */
-  overflow-y: auto; /* Enable vertical scroll */
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
 .sticky-header th {
@@ -239,5 +202,10 @@ export default {
   top: 0;
   z-index: 1;
   background-color: var(--primary-color);
+}
+
+.btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 </style>
