@@ -37,19 +37,24 @@
             </th>
             <th class="py-3 px-6 border-b cursor-pointer" @click="sortBy('file_name')">
               File Name
-              <i v-if="sortColumn === 'file_name'" :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+              <i v-if="sortColumn === 'file_name'"
+                :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
             </th>
             <th class="py-3 px-6 border-b cursor-pointer" @click="sortBy('created_at')">
               Created
-              <i v-if="sortColumn === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+              <i v-if="sortColumn === 'created_at'"
+                :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
             </th>
             <th class="py-3 px-6 border-b cursor-pointer" @click="sortBy('updated_at')">
               Updated
-              <i v-if="sortColumn === 'updated_at'" :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+              <i v-if="sortColumn === 'updated_at'"
+                :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
             </th>
-            <th v-for="(field, index) in fieldNames" :key="index" class="py-3 px-6 border-b cursor-pointer" @click="sortBy(field)">
+            <th v-for="(field, index) in fieldNames" :key="index" class="py-3 px-6 border-b cursor-pointer"
+              @click="sortBy(field)">
               {{ field }}
-              <i v-if="sortColumn === field" :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+              <i v-if="sortColumn === field"
+                :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
             </th>
             <th class="py-3 px-6 border-b">Actions</th>
           </tr>
@@ -77,12 +82,21 @@
         </tbody>
       </table>
 
-      <!-- Pagination Links -->
-      <div class="mt-4 flex justify-between">
-        <button @click="fetchPaginatedData(pagination.prev_page_url)" :disabled="!pagination.prev_page_url"
-          class="btn text-white px-4 py-2">Previous</button>
-        <button @click="fetchPaginatedData(pagination.next_page_url)" :disabled="!pagination.next_page_url"
-          class="btn text-white px-4 py-2">Next</button>
+      <!-- Pagination with Improved Design -->
+      <div class="mt-6 flex justify-between items-center">
+        <div class="text-sm text-gray-600">
+          Page {{ pagination.current_page }} of {{ pagination.last_page }}
+        </div>
+        <div class="space-x-2">
+          <button @click="fetchPaginatedData(pagination.prev_page_url)" :disabled="!pagination.prev_page_url"
+            class="btn px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            Previous
+          </button>
+          <button @click="fetchPaginatedData(pagination.next_page_url)" :disabled="!pagination.next_page_url"
+            class="btn px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            Next
+          </button>
+        </div>
       </div>
     </div>
   </div>
