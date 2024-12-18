@@ -17,7 +17,7 @@ class DocumentSeeder extends Seeder
         $faker = Faker::create();
 
         // Create 100 random documents
-        foreach (range(1, 1000) as $index) {
+        foreach (range(1, 500) as $index) {
             Document::create([
                 'file_name' => $faker->word . '.pdf',
                 'created_at' => $faker->dateTimeBetween('2024-11-01', 'now'),

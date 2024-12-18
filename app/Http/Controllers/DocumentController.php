@@ -15,7 +15,7 @@ class DocumentController extends Controller
     // Get a list of all documents
     public function index(Request $request)
     {
-        $query = Document::with('documentData.field');
+        $query = Document::query();
 
         // Searching
         if ($request->has('search') && $request->search) {
@@ -38,16 +38,27 @@ class DocumentController extends Controller
         }
 
         // Sorting
-        if ($request->has('sort_column') && $request->has('sort_direction')) {
-            $validColumns = ['file_name', 'created_at', 'updated_at'];
-            $sortColumn = in_array($request->sort_column, $validColumns) ? $request->sort_column : 'created_at';
-            $sortDirection = $request->sort_direction === 'desc' ? 'desc' : 'asc';
-            $query->orderBy($sortColumn, $sortDirection);
+        if ($request->has('sort_by') && $request->has('order')) {
+            $sortBy = $request->sort_by;
+            $order = $request->order;
+
+            if (in_array($sortBy, ['file_name', 'created_at', 'updated_at'])) {
+                $query->orderBy($sortBy, $order);
+            } else {
+                $query->select('documents.*')
+                    ->join('document_data', 'documents.id', '=', 'document_data.document_id')
+                    ->join('fields', 'document_data.field_id', '=', 'fields.id')
+                    ->where('fields.field_name', $sortBy)
+                    ->orderBy('document_data.value', $order);
+            }
         }
 
         // Paginate the results
-        return $query->paginate(20);
+        $documents = $query->with('documentData.field')->paginate(20);
+
+        return response()->json($documents);
     }
+
 
 
 

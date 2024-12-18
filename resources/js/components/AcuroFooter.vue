@@ -20,13 +20,11 @@
       </div>
       <div class="text-sm mt-6 md:mt-0 text-center md:text-left">
         <div class="flex justify-center md:justify-start mb-2">
-          <a href="https://www.linkedin.com" target="_blank" class="hover:text-secondary mx-2" aria-label="LinkedIn">
+          <a href="https://nl.linkedin.com/company/acurobrandveiligheidenbouwregie" target="_blank" class="hover:text-secondary mx-2" aria-label="LinkedIn">
             <i class="fab fa-linkedin-in"></i>
           </a>
-          <a href="https://www.facebook.com" target="_blank" class="hover:text-secondary mx-2" aria-label="Facebook">
-            <i class="fab fa-facebook-f"></i>
-          </a>
-          <a href="https://www.instagram.com" target="_blank" class="hover:text-secondary mx-2" aria-label="Instagram">
+         
+          <a href="https://www.instagram.com/acurobrandveiligheidbouwregie/" target="_blank" class="hover:text-secondary mx-2" aria-label="Instagram">
             <i class="fab fa-instagram"></i>
           </a>
         </div>

@@ -35,11 +35,21 @@
             <th class="py-3 px-6 border-b">
               <!-- <input type="checkbox" @change="toggleSelectAll" v-model="selectAll" /> -->
             </th>
-            <th @click="sortBy('file_name')" class="py-3 px-6 border-b cursor-pointer">File Name</th>
-            <th @click="sortBy('created_at')" class="py-3 px-6 border-b cursor-pointer">Created</th>
-            <th @click="sortBy('updated_at')" class="py-3 px-6 border-b cursor-pointer">Updated</th>
-            <th v-for="(field, index) in fieldNames" :key="index" class="py-3 px-6 border-b">
+            <th class="py-3 px-6 border-b cursor-pointer" @click="sortBy('file_name')">
+              File Name
+              <i v-if="sortColumn === 'file_name'" :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+            </th>
+            <th class="py-3 px-6 border-b cursor-pointer" @click="sortBy('created_at')">
+              Created
+              <i v-if="sortColumn === 'created_at'" :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+            </th>
+            <th class="py-3 px-6 border-b cursor-pointer" @click="sortBy('updated_at')">
+              Updated
+              <i v-if="sortColumn === 'updated_at'" :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
+            </th>
+            <th v-for="(field, index) in fieldNames" :key="index" class="py-3 px-6 border-b cursor-pointer" @click="sortBy(field)">
               {{ field }}
+              <i v-if="sortColumn === field" :class="sortDirection === 'asc' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'"></i>
             </th>
             <th class="py-3 px-6 border-b">Actions</th>
           </tr>
@@ -106,8 +116,8 @@ export default {
         search: this.searchQuery,
         start_date: this.startDate,
         end_date: this.endDate,
-        sort_column: this.sortColumn,
-        sort_direction: this.sortDirection,
+        sort_by: this.sortColumn,
+        order: this.sortDirection,
       };
 
       fetchDocuments(fetchUrl, params).then((response) => {
