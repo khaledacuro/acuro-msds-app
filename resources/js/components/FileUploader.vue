@@ -1,32 +1,22 @@
 <template>
   <div class="max-w-screen-md mx-auto bg-white p-10 shadow-lg rounded-lg mt-20">
     <!-- Title of the form -->
-    <h2 class="text-3xl font-bold text-primary mb-8 text-center">Select file(s) to upload</h2>
+    <h2 class="text-3xl font-bold text-primary mb-6 text-center flex items-center justify-center">
+      <i class="fas fa-upload h-8 w-8 mr-3 text-primary"></i>
+      Upload MSDS Documents
+    </h2>
 
     <!-- Form for file upload -->
     <form @submit.prevent="uploadFiles" class="space-y-6">
       <!-- Custom Browse Button with Hidden Input -->
       <div
-        class="relative flex items-center justify-start border-2 border-dashed border-gray-300 p-6 rounded-lg"
-      >
-        <input
-          type="file"
-          multiple
-          accept=".pdf"
-          @change="handleFileUpload"
-          class="absolute inset-0 opacity-0 cursor-pointer"
-          ref="fileInput"
-          :disabled="loading"
-        />
-        <button
-          type="button"
-          class="btn py-3 px-8 rounded-lg text-lg"
-          @click="triggerFileInput"
-          :disabled="loading"
-        >
-          Browse Files
-        </button>
+        class="relative flex flex-col items-center justify-center border-2 border-dashed border-gray-300 p-8 rounded-lg text-center">
+        <input type="file" multiple accept=".pdf" @change="handleFileUpload"
+          class="absolute inset-0 opacity-0 cursor-pointer" ref="fileInput" :disabled="loading" />
+        <i class="fas fa-file-pdf text-gray-400 text-4xl mb-4"></i>
+        <p class="text-gray-500">Drag and drop PDF files or click to browse</p>
       </div>
+
 
       <!-- Display list of selected files with status (uploading, success, or error) -->
       <ul v-if="selectedFiles.length" class="mt-4 text-sm text-primary space-y-2">
@@ -35,11 +25,7 @@
           <span class="text-primary">{{ file.name }}</span>
 
           <!-- Remove file button -->
-          <button
-            v-if="!loading"
-            @click.prevent="removeFile(index)"
-            class="text-error hover:text-red-600 ml-2"
-          >
+          <button v-if="!loading" @click.prevent="removeFile(index)" class="text-error hover:text-red-600 ml-2">
             <i class="fas fa-trash-alt"></i> Remove
           </button>
 
@@ -63,19 +49,24 @@
       <p v-if="successMessage" class="text-secondary mt-4">{{ successMessage }}</p>
 
       <!-- Upload and Reset Buttons -->
-      <div class="text-start space-x-4">
-        <button
-          type="button"
-          @click.prevent="resetFiles"
-          class="btn py-3 px-8 rounded-lg text-lg bg-gray-300 hover:bg-gray-400"
-          :disabled="loading"
-        >
+      <div class="text-start space-x-4 flex justify-start">
+        <!-- Reset Button -->
+        <button type="button" @click.prevent="resetFiles"
+          class="flex items-center justify-center btn py-3 px-6 rounded-lg text-lg bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold transition-all duration-300"
+          :disabled="loading">
+          <i class="fas fa-sync mr-2"></i>
           Reset
         </button>
-        <button type="submit" class="btn py-3 px-8 rounded-lg text-lg" :disabled="loading">
+
+        <!-- Upload Button -->
+        <button type="submit"
+          class="flex items-center justify-center btn py-3 px-6 rounded-lg text-lg bg-secondary hover:bg-primary-hover text-white font-semibold transition-all duration-300"
+          :disabled="loading">
+          <i :class="loading ? 'fas fa-spinner fa-spin mr-2' : 'fas fa-upload mr-2'"></i>
           {{ loading ? 'Uploading...' : 'Upload' }}
         </button>
       </div>
+
     </form>
 
     <!-- List of Uploaded Files -->
