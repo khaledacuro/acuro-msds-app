@@ -18,14 +18,12 @@
         "laravel-vite-plugin": "^1.0",
         "postcss": "^8.4.49",
         "prettier": "^3.4.2",
-        "tailwindcss": "^3.4.16",
+        "tailwindcss": "^3.4.17",
         "vite": "^6.0.3",
         "vite-plugin-vue-devtools": "^7.6.8",
         "vitest": "^2.1.8"
     },
     "dependencies": {
-        "datatables.net": "^2.1.8",
-        "datatables.net-dt": "^2.1.8",
         "glob": "^11.0.0",
         "jquery": "^3.7.1",
         "rimraf": "^6.0.1",
