@@ -10,7 +10,7 @@ class DocumentDataController extends Controller
     // Retrieve all document data
     public function index()
     {
-        $documentData = DocumentData::all();
+        $documentData = DocumentData::with('field')->paginate(20);
         return response()->json($documentData);
     }
     
@@ -18,7 +18,7 @@ class DocumentDataController extends Controller
     // Retrieve specific data related to a document by document ID
     public function show($documentId)
     {
-        $documentData = DocumentData::where('document_id', $documentId)->get();
+        $documentData = DocumentData::where('document_id', $documentId)->with('field')->get();
         if ($documentData->isEmpty()) {
             return response()->json(['message' => 'No data found for this document'], 404);
         }
